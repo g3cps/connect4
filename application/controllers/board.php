@@ -52,8 +52,8 @@ class Board extends CI_Controller {
 	    			$data['status'] = 'waiting';
 	    			break;
 	    	}
-	    	
-		$this->load->view('match/board',$data);
+	    $data['main'] = 'match/board';
+		$this->load->view('template',$data);
     }
 
  	function postMsg() {
@@ -111,7 +111,8 @@ class Board extends CI_Controller {
  		$this->db->trans_begin();
  			
  		$match = $this->match_model->getExclusive($user->match_id);			
- 			
+ 		
+ 		//Look for which user's message to get
  		if ($match->user1_id == $user->id) {
 			$msg = $match->u2_msg;
  			$this->match_model->updateMsgU2($match->id,"");

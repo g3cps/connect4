@@ -12,6 +12,7 @@
 		var status = "<?= $status ?>";
 		
 		$(function(){
+			//Receive data
 			$('body').everyTime(2000,function(){
 					if (status == 'waiting') {
 						$.getJSON('<?= base_url() ?>arcade/checkInvitation',function(data, text, jqZHR){
@@ -36,13 +37,14 @@
 						}
 					});
 			});
-
+			//Send data
 			$('form').submit(function(){
 				var arguments = $(this).serialize();
 				var url = "<?= base_url() ?>board/postMsg";
 				$.post(url,arguments, function (data,textStatus,jqXHR){
 						var conversation = $('[name=conversation]').val();
 						var msg = $('[name=msg]').val();
+						//append message to the end of conversation
 						$('[name=conversation]').val(conversation + "\n" + user + ": " + msg);
 						});
 				return false;
