@@ -6,6 +6,9 @@ class Account extends CI_Controller {
     		// Call the Controller constructor
 	    	parent::__construct();
 	    	session_start();
+	    	$this->load->library('securimage');
+			$this->load->helper('url');
+			$this->load->helper('html');
     }
         
     public function _remap($method, $params = array()) {
@@ -69,7 +72,12 @@ class Account extends CI_Controller {
 	    	$this->load->view('account/newForm');
     }
     
+    function captcha() {
+		$this->securimage->show();
+	}
+    
     function createNew() {
+		    $captcha = $this->input->post('captcha');
     		$this->load->library('form_validation');
     	    $this->form_validation->set_rules('username', 'Username', 'required|is_unique[user.login]');
 	    	$this->form_validation->set_rules('password', 'Password', 'required');
@@ -78,7 +86,7 @@ class Account extends CI_Controller {
 	    	$this->form_validation->set_rules('email', 'Email', "required|is_unique[user.email]");
 	    	
 	    
-	    	if ($this->form_validation->run() == FALSE)
+	    	if ($this->form_validation->run() == FALSE || $this->securimage->check($captcha) == FALSE)
 	    	{
 	    		$this->load->view('account/newForm');
 	    	}
