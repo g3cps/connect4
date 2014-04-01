@@ -15,10 +15,10 @@
 			//Receive data
 			$('body').everyTime(2000,function(){
 					if (status == 'waiting') {
-						$.getJSON('<?= base_url() ?>arcade/checkInvitation',function(data, text, jqZHR){
+						$.getJSON('<?= base_url() ?>index.php/arcade/checkInvitation',function(data, text, jqZHR){
 								if (data && data.status=='rejected') {
 									alert("Sorry, your invitation to play was declined!");
-									window.location.href = '<?= base_url() ?>arcade/index';
+									window.location.href = '<?= base_url() ?>index.php/arcade/index';
 								}
 								if (data && data.status=='accepted') {
 									status = 'playing';
@@ -27,7 +27,7 @@
 								
 						});
 					}
-					var url = "<?= base_url() ?>board/getMsg";
+					var url = "<?= base_url() ?>index.php/board/getMsg";
 					$.getJSON(url, function (data,text,jqXHR){
 						if (data && data.status=='success') {
 							var conversation = $('[name=conversation]').val();
@@ -40,7 +40,7 @@
 			//Send data
 			$('form').submit(function(){
 				var arguments = $(this).serialize();
-				var url = "<?= base_url() ?>board/postMsg";
+				var url = "<?= base_url() ?>index.php/board/postMsg";
 				$.post(url,arguments, function (data,textStatus,jqXHR){
 						var conversation = $('[name=conversation]').val();
 						var msg = $('[name=msg]').val();
@@ -57,7 +57,7 @@
 	<h1>Game Area</h1>
 
 	<div>
-	Hello <?= $user->fullName() ?>  <?= anchor('account/logout','(Logout)') ?>  
+	Hello <?= $user->fullName() ?>  <?= anchor('index.php/account/logout','(Logout)') ?>  
 	</div>
 	
 	<div id='status'> 
