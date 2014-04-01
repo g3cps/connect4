@@ -33,6 +33,7 @@ class Account extends CI_Controller {
 
     function loginForm() {
     		$data['main'] = 'account/loginForm';
+    		$data['title'] = 'Connect 4 - Login';
     		$this->load->view('template', $data);
     }
     
@@ -41,6 +42,7 @@ class Account extends CI_Controller {
     		$this->form_validation->set_rules('username', 'Username', 'required');
     		$this->form_validation->set_rules('password', 'Password', 'required');
     		$data['main'] = 'account/loginForm';
+    		$data['title'] = 'Connect 4 - Login';
     		if ($this->form_validation->run() == FALSE)
     		{
     			$this->load->view('template', $data);
@@ -79,6 +81,7 @@ class Account extends CI_Controller {
 
     function newForm() {
     		$data['main'] = 'account/newForm';
+    		$data['title'] = 'Connect 4 - Create Account';
 	    	$this->load->view('template', $data);
     }
     
@@ -99,6 +102,7 @@ class Account extends CI_Controller {
 	    	if ($this->form_validation->run() == FALSE || $this->securimage->check($captcha) == FALSE)
 	    	{
 	    		$data['main'] = 'account/newForm';
+	    		$data['title'] = 'Connect 4 - Create Account';
 	    		$this->load->view('template', $data);
 	    	}
 	    	else  
@@ -117,6 +121,7 @@ class Account extends CI_Controller {
 	    		
 	    		$error = $this->user_model->insert($user);
 	    		$data['main'] = 'account/loginForm';
+	    		$data['title'] = 'Connect 4 - Login';
 	    		$this->load->view('account/loginForm', $data);
 	    	}
     }
@@ -124,6 +129,7 @@ class Account extends CI_Controller {
     
     function updatePasswordForm() {
     		$data['main'] = 'account/updatePasswordForm';
+    		$data['title'] = 'Connect 4 - Update Password';
 	    	$this->load->view('template', $data);
     }
     
@@ -132,6 +138,7 @@ class Account extends CI_Controller {
 	    	$this->form_validation->set_rules('oldPassword', 'Old Password', 'required');
 	    	$this->form_validation->set_rules('newPassword', 'New Password', 'required');
 	    	$data['main'] = 'account/updatePasswordForm';
+	    	$data['title'] = 'Connect 4 - Update Password';
 	    	 
 	    	if ($this->form_validation->run() == FALSE)
 	    	{
@@ -159,13 +166,15 @@ class Account extends CI_Controller {
     
     function recoverPasswordForm() {
     		$data['main'] = 'account/recoverPasswordForm';
+    		$data['title'] = 'Connect 4 - Password Recovery';
     		$this->load->view('template', $data);
     }
     
     function recoverPassword() {
 	    	$this->load->library('form_validation');
 	    	$this->form_validation->set_rules('email', 'email', 'required');
-	    	
+	    	$data['title'] = 'Connect 4 - Password Recovery';
+
 	    	if ($this->form_validation->run() == FALSE)
 	    	{
 	    		$data['main'] = 'account/recoverPasswordForm';
