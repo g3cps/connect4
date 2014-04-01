@@ -20,18 +20,27 @@ class Account extends CI_Controller {
     }
           
     
+    function index(){
+    		if (!isset($_SESSION['user'])){
+   				redirect('account/loginForm', 'refresh'); //Then we redirect to the index page again
+   			} else {
+   				redirect('arcade/index', 'refresh');
+   			}
+    }
+
     function loginForm() {
-    		$this->load->view('account/loginForm');
+    		$data['main'] = 'account/loginForm';
+    		$this->load->view('template', $data);
     }
     
     function login() {
     		$this->load->library('form_validation');
     		$this->form_validation->set_rules('username', 'Username', 'required');
     		$this->form_validation->set_rules('password', 'Password', 'required');
-
+    		$data['main'] = 'account/loginForm';
     		if ($this->form_validation->run() == FALSE)
     		{
-    			$this->load->view('account/loginForm');
+    			$this->load->view('template', $data);
     		}
     		else
     		{
@@ -52,7 +61,7 @@ class Account extends CI_Controller {
     			}
  			else {   			
 				$data['errorMsg']='Incorrect username or password!';
- 				$this->load->view('account/loginForm',$data);
+ 				$this->load->view('template',$data);
  			}
     		}
     }
@@ -66,7 +75,8 @@ class Account extends CI_Controller {
     }
 
     function newForm() {
-	    	$this->load->view('account/newForm');
+    		$data['main'] = 'account/newForm';
+	    	$this->load->view('template', $data);
     }
     
     function createNew() {
@@ -80,7 +90,8 @@ class Account extends CI_Controller {
 	    
 	    	if ($this->form_validation->run() == FALSE)
 	    	{
-	    		$this->load->view('account/newForm');
+	    		$data['main'] = 'account/newForm';
+	    		$this->load->view('template', $data);
 	    	}
 	    	else  
 	    	{
@@ -97,25 +108,26 @@ class Account extends CI_Controller {
 	    		 
 	    		
 	    		$error = $this->user_model->insert($user);
-	    		
-	    		$this->load->view('account/loginForm');
+	    		$data['main'] = 'account/loginForm';
+	    		$this->load->view('account/loginForm', $data);
 	    	}
     }
 
     
     function updatePasswordForm() {
-	    	$this->load->view('account/updatePasswordForm');
+    		$data['main'] = 'account/updatePasswordForm';
+	    	$this->load->view('template', $data);
     }
     
     function updatePassword() {
 	    	$this->load->library('form_validation');
 	    	$this->form_validation->set_rules('oldPassword', 'Old Password', 'required');
 	    	$this->form_validation->set_rules('newPassword', 'New Password', 'required');
-	    	 
+	    	$data['main'] = 'account/updatePasswordForm';
 	    	 
 	    	if ($this->form_validation->run() == FALSE)
 	    	{
-	    		$this->load->view('account/updatePasswordForm');
+	    		$this->load->view('template', $data);
 	    	}
 	    	else
 	    	{
@@ -132,13 +144,14 @@ class Account extends CI_Controller {
 	    		}
 	    		else {
 	    			$data['errorMsg']="Incorrect password!";
-	    			$this->load->view('account/updatePasswordForm',$data);
+	    			$this->load->view('template', $data);
 	    		}
 	    	}
     }
     
     function recoverPasswordForm() {
-    		$this->load->view('account/recoverPasswordForm');
+    		$data['main'] = 'account/recoverPasswordForm';
+    		$this->load->view('template', $data);
     }
     
     function recoverPassword() {
@@ -147,7 +160,8 @@ class Account extends CI_Controller {
 	    	
 	    	if ($this->form_validation->run() == FALSE)
 	    	{
-	    		$this->load->view('account/recoverPasswordForm');
+	    		$data['main'] = 'account/recoverPasswordForm';
+	    		$this->load->view('template', $data);
 	    	}
 	    	else
 	    	{ 
@@ -185,11 +199,13 @@ class Account extends CI_Controller {
 	    			//$data['errorMsg'] = $this->email->print_debugger();	
 	    			
 	    			//$this->load->view('emailPage',$data);
-	    			$this->load->view('account/emailPage');
+	    			$data['main'] = 'account/emailPage';
+	    			$this->load->view('template', $data);
 	    			
 	    		}
 	    		else {
 	    			$data['errorMsg']="No record exists for this email!";
+	    			$data['main'] = 'account/recoverPasswordForm';
 	    			$this->load->view('account/recoverPasswordForm',$data);
 	    		}
 	    	}
