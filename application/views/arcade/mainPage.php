@@ -10,19 +10,19 @@
 	<script>
 		$(function(){
 			$('#availableUsers').everyTime(500,function(){
-					$('#availableUsers').load('<?= base_url() ?>arcade/getAvailableUsers');
+					$('#availableUsers').load('<?= base_url() ?>index.php/arcade/getAvailableUsers');
 
-					$.getJSON('<?= base_url() ?>arcade/getInvitation',function(data, text, jqZHR){
+					$.getJSON('<?= base_url() ?>index.php/arcade/getInvitation',function(data, text, jqZHR){
 							if (data && data.invited) {
 								var user=data.login;
 								var time=data.time;
 								if(confirm('Play ' + user)) 
-									$.getJSON('<?= base_url() ?>arcade/acceptInvitation',function(data, text, jqZHR){
+									$.getJSON('<?= base_url() ?>index.php/arcade/acceptInvitation',function(data, text, jqZHR){
 										if (data && data.status == 'success')
-											window.location.href = '<?= base_url() ?>board/index'
+											window.location.href = '<?= base_url() ?>index.php/board/index'
 									});
 								else  
-									$.post("<?= base_url() ?>arcade/declineInvitation");
+									$.post("<?= base_url() ?>index.php/arcade/declineInvitation");
 							}
 						});
 				});
