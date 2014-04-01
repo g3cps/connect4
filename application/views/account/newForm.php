@@ -47,9 +47,16 @@
 	echo form_label('Email');
 	echo form_error('email');
 	echo form_input('email',set_value('email'),"required");
+?>
+<p></p><img src="<?=site_url('account/captcha')?>" alt='captcha' /></p>
+<?php
+	echo form_label('Captcha');
+	echo form_error('captcha');
+	echo form_input('captcha',set_value('captcha'),"required");
 	echo form_submit('submit', 'Register');
 	echo form_close();
 ?>	
+
 </body>
 
 </html>
