@@ -53,6 +53,7 @@ class Board extends CI_Controller {
 	    			break;
 	    	}
 	    $data['main'] = 'match/board';
+	    $data['title'] = 'Connect 4 - Game';
 		$this->load->view('template',$data);
     }
 

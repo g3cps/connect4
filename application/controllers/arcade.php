@@ -25,6 +25,7 @@ class Arcade extends CI_Controller {
 		    		unset($_SESSION['errmsg']);
 		    	}
 		    	$data['main'] = 'arcade/mainPage';
+		    	$data['title'] = 'Connect 4 - Mainpage';
 		    	$this->load->view('template',$data);
 		    	//$this->load->view('arcade/mainPage',$data);
     }
@@ -34,6 +35,7 @@ class Arcade extends CI_Controller {
     		$users = $this->user_model->getAvailableUsers();
     		$data['users']=$users;
     		$data['currentUser']=$_SESSION['user'];
+    		$data['title'] = 'Connect 4 - Invite';
     		$this->load->view('arcade/availableUsers',$data);
     }
     
