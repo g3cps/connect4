@@ -13,7 +13,6 @@ class Arcade extends CI_Controller {
     		
     		if (!isset($_SESSION['user']))
    			redirect('account/loginForm', 'refresh'); //Then we redirect to the index page again
- 	    	
 	    	return call_user_func_array(array($this, $method), $params);
     }
        
@@ -101,7 +100,7 @@ class Arcade extends CI_Controller {
 	    
 	    // if all went well commit changes
 	    $this->db->trans_commit();
-	    
+	    $_SESSION['turn'] = TRUE; //Have the move first
 	    echo json_encode(array('status'=>'success'));
 	    
 	    return;

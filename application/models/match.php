@@ -8,6 +8,7 @@ class Match  {
 	
 	public $user1_id;  
 	public $user2_id;
+	public $board_state;
 	
 	public $match_status_id = self::ACTIVE;
 		

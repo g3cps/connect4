@@ -58,6 +58,7 @@ class Account extends CI_Controller {
     			 
     			if (isset($user) && $user->comparePassword($clearPassword)) {
     				$_SESSION['user'] = $user;
+    				$_SESSION['turn'] = FALSE; //Keep track of player's turn
     				$data['user']=$user;
     				
     				$this->user_model->updateStatus($user->id, User::AVAILABLE);

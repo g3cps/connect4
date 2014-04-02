@@ -38,17 +38,22 @@
 					});
 			});
 			//Send data
+			$('.board').click(function(){
+				var row = $(this).attr('id');
+				$('[name=msg]').val(row);
+				$( "form" ).trigger( "submit");
+			});
 			$('form').submit(function(){
 				var arguments = $(this).serialize();
 				var url = "<?= base_url() ?>index.php/board/postMsg";
 				$.post(url,arguments, function (data,textStatus,jqXHR){
-						var conversation = $('[name=conversation]').val();
-						var msg = $('[name=msg]').val();
-						//append message to the end of conversation
-						$('[name=conversation]').val(conversation + "\n" + user + ": " + msg);
-						});
+					var conversation = $('[name=conversation]').val();
+					var msg = $('[name=msg]').val();
+					//append message to the end of conversation
+					$('[name=conversation]').val(conversation + "\n" + user + ": " + msg);
+				});
 				return false;
-				});	
+			});	
 		});
 	
 	</script>
@@ -68,11 +73,24 @@
 			echo "Wating on " . $otherUser->login;
 	?>
 	</div>
+
+	<div>
+		<table>
+			<?php
+				//Generate the table layout
+				for ($y=0; $y<6; $y++){
+					echo "<tr>";
+					for ($x=0; $x<7; $x++){
+						echo "<td class='board' id='$x'></td>";
+					}
+					echo "</tr>";
+				}
+			?>
+		</table>
+	</div>
 	
 <?php 
-	
 	echo form_textarea('conversation');
-	
 	echo form_open();
 	echo form_input('msg');
 	echo form_submit('Send','Send');
