@@ -39,6 +39,22 @@ class Board extends CI_Controller {
     			$otherUser = $this->user_model->getFromId($match->user2_id);
     		else
     			$otherUser = $this->user_model->getFromId($match->user1_id);
+				
+			//Creat board array
+    		$board = array();
+			for ($x=0; $x<7; $x++){
+				array_push($board, array());
+				for ($y=0; $y<6; $y++){
+					array_push($board[$x], -1);
+				}
+			}
+			$_SESSION['board'] = $board;
+			$serialized = array();
+			for ($x = 0; $x < 7; $x++){
+				array_push($serialized, serialize($_SESSION['board'][$x]));
+			}
+			$serialized = serialize($serialized);
+			$this->match_model->updateBoard($match->id, $serialized);
     	}
     	
     	$data['user']=$user;
@@ -53,16 +69,6 @@ class Board extends CI_Controller {
     			break;
     	}
 
-    	//Creat board array
-    	$board = new ArrayObject();
-		for ($x=0; $x<7; $x++){
-			$board->append(new ArrayObject());
-			for ($y=0; $y<6; $y++){
-				$board[$x]->append(0);
-			}
-		}
-		$_SESSION['board'] = $board;
-
 	    $data['main'] = 'match/board';
 	    $data['title'] = 'Connect 4 - Game';
 		$this->load->view('template',$data);
@@ -75,19 +81,52 @@ class Board extends CI_Controller {
 		$user = $_SESSION['user'];
 		$turn = $_SESSION['turn'];
 		
-		if (!$turn)
-			goto not_turn;
+		if (!$turn){
+			$errormsg="Not Your turn";
+			goto error;
+		}
 
 		$user = $this->user_model->getExclusive($user->login);
 		if ($user->user_status_id != User::PLAYING) {	
-		$errormsg="Not in PLAYING state";
+			$errormsg="Not in PLAYING state";
 			goto error;
 		}
 		
 		$match = $this->match_model->get($user->match_id);			
 		
-		//Change this to get row
 		$msg = $this->input->post('msg');
+		
+		//Check if message is a number
+		if (is_numeric($msg)){
+			$col = (int) $msg;
+		} else {
+			$errormsg="message not a number: " . $msg;
+			goto error;
+		}
+		
+		$check_cell = 0;
+		if ($_SESSION['board'][$col][0] != -1){ //Column is full
+			$errormsg="Column is full";
+			goto error;
+		}
+		while ($check_cell <= 5){
+			if ($check_cell + 1 > 5){
+				$_SESSION['board'][$col][5] = $user->id;
+				break;
+			} elseif ($_SESSION['board'][$col][$check_cell + 1] != -1){ //Insert to bottom most
+				$_SESSION['board'][$col][$check_cell] = $user->id;
+				break;
+			} 
+			$check_cell += 1;
+		}
+		//Begin serialize the array and put it into the database
+		$serialized = array();
+		for ($x = 0; $x < 7; $x++){
+			//Serialize each column independently
+			array_push($serialized, serialize($_SESSION['board'][$x]));
+		}
+		$serialized = serialize($serialized); //Serialize the whole 2d array
+		$this->match_model->updateBoard($match->id, $serialized);
 		
 		if ($match->user1_id == $user->id)  {
 			$msg = $match->u1_msg == ''? $msg :  $match->u1_msg . "\n" . $msg;
@@ -106,12 +145,9 @@ class Board extends CI_Controller {
  		
 		error:
 			echo json_encode(array('status'=>'failure','message'=>$errormsg));
-		not_turn:
-			echo json_encode(array('status'=>'failure','message'=>"Not your turn!"));
  	}
  
 	function getMsg() {
-
  		$this->load->model('user_model');
  		$this->load->model('match_model');
  			
@@ -124,7 +160,16 @@ class Board extends CI_Controller {
  		// start transactional mode  
  		$this->db->trans_begin();
  			
- 		$match = $this->match_model->getExclusive($user->match_id);			
+ 		$match = $this->match_model->getExclusive($user->match_id);	
+		
+		//update board array
+		$_SESSION['board'] = unserialize($match->board_state);
+		$unserialized = array();
+		for ($x = 0; $x < 7; $x++){
+			array_push($unserialized, unserialize($_SESSION['board'][$x]));
+		}
+		$_SESSION['board'] = $unserialized;
+		print_r($_SESSION['board']);		
  		
  		//Look for which user's message to get
  		if ($match->user1_id == $user->id) {
@@ -157,6 +202,11 @@ class Board extends CI_Controller {
 		error:
 		echo json_encode(array('status'=>'failure','message'=>$errormsg));
  	}
+	
+	/*For client side to get the new board by ajax*/
+	function getBoard(){
+		echo json_encode($_SESSION['board']);
+	}
  	
  }
 

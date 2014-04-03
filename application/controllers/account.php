@@ -123,7 +123,7 @@ class Account extends CI_Controller {
 	    		$error = $this->user_model->insert($user);
 	    		$data['main'] = 'account/loginForm';
 	    		$data['title'] = 'Connect 4 - Login';
-	    		$this->load->view('account/loginForm', $data);
+	    		$this->load->view('template', $data);
 	    	}
     }
 
