@@ -154,6 +154,16 @@ class Board extends CI_Controller {
 			   ($col + 3 < 7 && $row - 3 <= 0 && $_SESSION['board'][$col + 1][$row - 1] == $user->id && $_SESSION['board'][$col + 2][$row - 2] == $user->id && $_SESSION['board'][$col + 3][$row - 3] == $user->id);
 			   
 		
+		if ($win && $user->id == $match->user1_id) {
+			$this->match_model->updateStatus($match->id, 2);
+			$this->user_model->updateStatus($user->id, 2);
+			$msg = "\nPlayer 1 wins! Game over!\n";
+		} else if ($win && $user->id == $match->user2_id) {
+			$this->match_model->updateStatus($match->id, 3);
+			$this->user_model->updateStatus($user->id, 2);
+			$msg = "\nPlayer 2 wins! Game over!\n";
+		}
+		
 		//Begin serialize the array and put it into the database
 		$serialized = array();
 		for ($x = 0; $x < 7; $x++){
@@ -196,6 +206,11 @@ class Board extends CI_Controller {
  		$this->db->trans_begin();
  			
  		$match = $this->match_model->getExclusive($user->match_id);	
+		
+		if ($match->match_status_id == 2 || $match->match_status_id == 3) {
+			$this->user_model->updateStatus($user->id, 2);
+		}
+		
 		
 		//update board array
 		$_SESSION['board'] = unserialize($match->board_state);
