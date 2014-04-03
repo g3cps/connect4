@@ -20,6 +20,7 @@ class Board extends CI_Controller {
     
     function index() {
 		$user = $_SESSION['user'];
+		
     		    	
     	$this->load->model('user_model');
     	$this->load->model('invite_model');
@@ -116,16 +117,46 @@ class Board extends CI_Controller {
 			$errormsg="Column is full";
 			goto error;
 		}
+		
+		$row = -1;
+		
+		ini_set("log_errors", 1);
+		ini_set("error_log", "/tmp/php-error.log");
+		
 		while ($check_cell <= 5){
 			if ($check_cell + 1 > 5){
-				$_SESSION['board'][$col][5] = $user->id;
+				$row = 5;
 				break;
 			} elseif ($_SESSION['board'][$col][$check_cell + 1] != -1){ //Insert to bottom most
-				$_SESSION['board'][$col][$check_cell] = $user->id;
+				$row = $check_cell;
 				break;
 			} 
 			$check_cell += 1;
 		}
+		$_SESSION['board'][$col][$row] = $user->id;
+		
+		
+		$win = ($col - 3 >= 0 && $_SESSION['board'][$col - 3][$row] == $user->id && $_SESSION['board'][$col - 2][$row] == $user->id && $_SESSION['board'][$col - 1][$row] == $user->id) ||
+			   ($col - 2 >= 0 && $col + 1 < 7 && $_SESSION['board'][$col - 2][$row] == $user->id && $_SESSION['board'][$col - 1][$row] == $user->id && $_SESSION['board'][$col + 1][$row] == $user->id) ||
+			   ($col - 1 >= 0 && $col + 2 < 7 && $_SESSION['board'][$col - 1][$row] == $user->id && $_SESSION['board'][$col + 1][$row] == $user->id && $_SESSION['board'][$col + 2][$row] == $user->id) ||
+			   ($col + 3 < 7 && $_SESSION['board'][$col + 1][$row] == $user->id && $_SESSION['board'][$col + 1][$row] == $user->id && $_SESSION['board'][$col + 2][$row] == $user->id && $_SESSION['board'][$col + 3][$row] == $user->id) ||
+	
+			   ($row - 3 >= 0 && $_SESSION['board'][$col][$row - 3] == $user->id && $_SESSION['board'][$col][$row - 2] == $user->id && $_SESSION['board'][$col][$row - 1] == $user->id) ||
+			   ($row - 2 >= 0 && $row + 1 < 6 && $_SESSION['board'][$col][$row - 2] == $user->id && $_SESSION['board'][$col][$row - 1] == $user->id && $_SESSION['board'][$row + 1] == $user->id) ||
+			   ($row - 1 >= 0 && $row + 2 < 6 && $_SESSION['board'][$col][$row - 1] == $user->id && $_SESSION['board'][$col][$row + 1] == $user->id && $_SESSION['board'][$row + 2] == $user->id) ||
+			   ($row + 3 < 6 && $_SESSION['board'][$col][$row + 1] == $user->id && $_SESSION['board'][$col][$row + 1] == $user->id && $_SESSION['board'][$col][$row + 2] == $user->id && $_SESSION['board'][$col][$row + 3] == $user->id) ||
+	
+			   ($col - 3 >= 0 && $row - 3 >= 0 && $_SESSION['board'][$col - 3][$row - 3] == $user->id && $_SESSION['board'][$col - 2][$row - 2] == $user->id && $_SESSION['board'][$col - 1][$row - 1] == $user->id) ||
+			   ($col - 2 >= 0 && $col + 1 < 7 && $row - 2 >= 0 && $row + 1 < 6 && $_SESSION['board'][$col - 2][$row - 2] == $user->id && $_SESSION['board'][$col - 1][$row - 1] == $user->id && $_SESSION['board'][$col + 1][$row + 1] == $user->id) ||
+			   ($col - 1 >= 0 && $col + 2 < 7 && $row - 1 >= 0 && $row + 2 < 6 && $_SESSION['board'][$col - 1][$row - 1] == $user->id && $_SESSION['board'][$col + 1][$row + 1] == $user->id && $_SESSION['board'][$col + 2][$row + 2] == $user->id) ||
+			   ($col + 3 < 7 && $row + 3 < 6 && $_SESSION['board'][$col + 1][$row + 1] == $user->id && $_SESSION['board'][$col + 2][$row + 2] == $user->id && $_SESSION['board'][$col + 3][$row + 3] == $user->id) ||
+	
+			   ($col - 3 >= 0 && $row + 3 < 6 && $_SESSION['board'][$col - 3][$row + 3] == $user->id && $_SESSION['board'][$col - 2][$row + 2] == $user->id && $_SESSION['board'][$col - 1][$row + 1] == $user->id) ||
+			   ($col - 2 >= 0 && $col + 1 < 7 && $row - 1 >= 0 && $row + 2 < 6 && $_SESSION['board'][$col - 2][$row + 2] == $user->id && $_SESSION['board'][$col - 1][$row - 1] == $user->id && $_SESSION['board'][$col + 1][$row - 1] == $user->id) ||
+			   ($col - 1 >= 0 && $col + 2 < 7 && $row - 2 >= 0 && $row + 1 < 6 && $_SESSION['board'][$col - 1][$row + 1] == $user->id && $_SESSION['board'][$col + 1][$row - 1] == $user->id && $_SESSION['board'][$col + 2][$row - 2] == $user->id) ||
+			   ($col + 3 < 7 && $row - 3 <= 0 && $_SESSION['board'][$col + 1][$row - 1] == $user->id && $_SESSION['board'][$col + 2][$row - 2] == $user->id && $_SESSION['board'][$col + 3][$row - 3] == $user->id);
+			   
+		
 		//Begin serialize the array and put it into the database
 		$serialized = array();
 		for ($x = 0; $x < 7; $x++){
@@ -217,28 +248,6 @@ class Board extends CI_Controller {
 	
 	function getPlayer(){
 		echo json_encode(array('p1'=>$_SESSION['p1'],'p2'=>$_SESSION['p2']));
-	}
- 	
-	function checkWin($x, $y, $player, $board) {
-		return (($x - 3 >= 0 && $board[$x - 3][$y] == $player && $board[$x - 2][$y] == $player && $board[$x - 1][$y] == $player) ||
-			   ($x - 2 >= 0 && $x + 1 < 7 && $board[$x - 2][$y] == $player && $board[$x - 1][$y] == $player && $board[$x + 1][$y] == $player) ||
-			   ($x - 1 >= 0 && $x + 2 < 7 && $board[$x - 1][$y] == $player && $board[$x + 1][$y] == $player && $board[$x + 2][$y] == $player) ||
-			   ($x + 3 < 7 && $board[$x + 1][$y] == $player && $board[$x + 1][$y] == $player && $board[$x + 2][$y] == $player && $board[$x + 3][$y] == $player) ||
-	
-			   ($y - 3 >= 0 && $board[$x][$y - 3] == $player && $board[$x][$y - 2] == $player && $board[$x][$y - 1] == $player) ||
-			   ($y - 2 >= 0 && $y + 1 < 6 && $board[$x][$y - 2] == $player && $board[$x][$y - 1] == $player && $board[$y + 1] == $player) ||
-			   ($y - 1 >= 0 && $y + 2 < 6 && $board[$x][$y - 1] == $player && $board[$x][$y + 1] == $player && $board[$y + 2] == $player) ||
-			   ($y + 3 < 6 && $board[$x][$y + 1] == $player && $board[$x][$y + 1] == $player && $board[$x][$y + 2] == $player && $board[$x][$y + 3] == $player) ||
-	
-			   ($x - 3 >= 0 && $y - 3 >= 0 && $board[$x - 3][$y - 3] == $player && $board[$x - 2][$y - 2] == $player && $board[$x - 1][$y - 1] == $player) ||
-			   ($x - 2 >= 0 && $x + 1 < 7 && $y - 2 >= 0 && $y + 1 < 6 && $board[$x - 2][$y - 2] == $player && $board[$x - 1][$y - 1] == $player && $board[$x + 1][$y + 1] == $player) ||
-			   ($x - 1 >= 0 && $x + 2 < 7 && $y - 1 >= 0 && $y + 2 < 6 && $board[$x - 1][$y - 1] == $player && $board[$x + 1][$y + 1] == $player && $board[$x + 2][$y + 2] == $player) ||
-			   ($x + 3 < 7 && $y + 3 < 6 && $board[$x + 1][$y + 1] == $player && $board[$x + 2][$y + 2] == $player && $board[$x + 3][$y + 3] == $player) ||
-	
-			   ($x - 3 >= 0 && $y + 3 < 6 && $board[$x - 3][$y + 3] == $player && $board[$x - 2][$y + 2] == $player && $board[$x - 1][$y + 1] == $player) ||
-			   ($x - 2 >= 0 && $x + 1 < 7 && $y - 1 >= 0 && $y + 2 < 6 && $board[$x - 2][$y + 2] == $player && $board[$x - 1][$y - 1] == $player && $board[$x + 1][$y - 1] == $player) ||
-			   ($x - 1 >= 0 && $x + 2 < 7 && $y - 2 >= 0 && $y + 1 < 6 && $board[$x - 1][$y + 1] == $player && $board[$x + 1][$y - 1] == $player && $board[$x + 2][$y - 2] == $player) ||
-			   ($x + 3 < 7 && $y - 3 <= 0 && $board[$x + 1][$y - 1] == $player && $board[$x + 2][$y - 2] == $player && $board[$x + 3][$y - 3] == $player));
 	}
 	
  }
