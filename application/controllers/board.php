@@ -120,9 +120,6 @@ class Board extends CI_Controller {
 		
 		$row = -1;
 		
-		ini_set("log_errors", 1);
-		ini_set("error_log", "/tmp/php-error.log");
-		
 		while ($check_cell <= 5){
 			if ($check_cell + 1 > 5){
 				$row = 5;
