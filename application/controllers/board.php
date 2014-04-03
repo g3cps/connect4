@@ -39,8 +39,8 @@ class Board extends CI_Controller {
     			$otherUser = $this->user_model->getFromId($match->user2_id);
     		else
     			$otherUser = $this->user_model->getFromId($match->user1_id);
-				
-			//Creat board array
+
+			//Create board array
     		$board = array();
 			for ($x=0; $x<7; $x++){
 				array_push($board, array());
@@ -59,7 +59,14 @@ class Board extends CI_Controller {
     	
     	$data['user']=$user;
     	$data['otherUser']=$otherUser;
-    	
+		if ($user->id < $otherUser->id){
+			$data['p1'] = $user->id;
+			$data['p2'] = $otherUser->id;
+		} else {
+			$data['p2'] = $user->id;
+			$data['p1'] = $otherUser->id;
+		}
+		
     	switch($user->user_status_id) {
     		case User::PLAYING:	
     			$data['status'] = 'playing';
@@ -138,7 +145,7 @@ class Board extends CI_Controller {
 		}
 		$_SESSION['turn'] = FALSE;
 
-		echo json_encode(array('status'=>'success', 'msg'=>$msg));
+		echo json_encode(array('status'=>'success', 'message'=>$msg));
 		return;
 		
  		$errormsg="Missing argument";
@@ -169,7 +176,7 @@ class Board extends CI_Controller {
 			array_push($unserialized, unserialize($_SESSION['board'][$x]));
 		}
 		$_SESSION['board'] = $unserialized;
-		print_r($_SESSION['board']);		
+		//print_r($_SESSION['board']);		
  		
  		//Look for which user's message to get
  		if ($match->user1_id == $user->id) {
@@ -207,6 +214,32 @@ class Board extends CI_Controller {
 	function getBoard(){
 		echo json_encode($_SESSION['board']);
 	}
+	
+	function getPlayer(){
+		echo json_encode(array('p1'=>$_SESSION['p1'],'p2'=>$_SESSION['p2']));
+	}
  	
+	function checkWin($x, $y, $player, $board) {
+		return (($x - 3 >= 0 && $board[$x - 3][$y] == $player && $board[$x - 2][$y] == $player && $board[$x - 1][$y] == $player) ||
+			   ($x - 2 >= 0 && $x + 1 < 7 && $board[$x - 2][$y] == $player && $board[$x - 1][$y] == $player && $board[$x + 1][$y] == $player) ||
+			   ($x - 1 >= 0 && $x + 2 < 7 && $board[$x - 1][$y] == $player && $board[$x + 1][$y] == $player && $board[$x + 2][$y] == $player) ||
+			   ($x + 3 < 7 && $board[$x + 1][$y] == $player && $board[$x + 1][$y] == $player && $board[$x + 2][$y] == $player && $board[$x + 3][$y] == $player) ||
+	
+			   ($y - 3 >= 0 && $board[$x][$y - 3] == $player && $board[$x][$y - 2] == $player && $board[$x][$y - 1] == $player) ||
+			   ($y - 2 >= 0 && $y + 1 < 6 && $board[$x][$y - 2] == $player && $board[$x][$y - 1] == $player && $board[$y + 1] == $player) ||
+			   ($y - 1 >= 0 && $y + 2 < 6 && $board[$x][$y - 1] == $player && $board[$x][$y + 1] == $player && $board[$y + 2] == $player) ||
+			   ($y + 3 < 6 && $board[$x][$y + 1] == $player && $board[$x][$y + 1] == $player && $board[$x][$y + 2] == $player && $board[$x][$y + 3] == $player) ||
+	
+			   ($x - 3 >= 0 && $y - 3 >= 0 && $board[$x - 3][$y - 3] == $player && $board[$x - 2][$y - 2] == $player && $board[$x - 1][$y - 1] == $player) ||
+			   ($x - 2 >= 0 && $x + 1 < 7 && $y - 2 >= 0 && $y + 1 < 6 && $board[$x - 2][$y - 2] == $player && $board[$x - 1][$y - 1] == $player && $board[$x + 1][$y + 1] == $player) ||
+			   ($x - 1 >= 0 && $x + 2 < 7 && $y - 1 >= 0 && $y + 2 < 6 && $board[$x - 1][$y - 1] == $player && $board[$x + 1][$y + 1] == $player && $board[$x + 2][$y + 2] == $player) ||
+			   ($x + 3 < 7 && $y + 3 < 6 && $board[$x + 1][$y + 1] == $player && $board[$x + 2][$y + 2] == $player && $board[$x + 3][$y + 3] == $player) ||
+	
+			   ($x - 3 >= 0 && $y + 3 < 6 && $board[$x - 3][$y + 3] == $player && $board[$x - 2][$y + 2] == $player && $board[$x - 1][$y + 1] == $player) ||
+			   ($x - 2 >= 0 && $x + 1 < 7 && $y - 1 >= 0 && $y + 2 < 6 && $board[$x - 2][$y + 2] == $player && $board[$x - 1][$y - 1] == $player && $board[$x + 1][$y - 1] == $player) ||
+			   ($x - 1 >= 0 && $x + 2 < 7 && $y - 2 >= 0 && $y + 1 < 6 && $board[$x - 1][$y + 1] == $player && $board[$x + 1][$y - 1] == $player && $board[$x + 2][$y - 2] == $player) ||
+			   ($x + 3 < 7 && $y - 3 <= 0 && $board[$x + 1][$y - 1] == $player && $board[$x + 2][$y - 2] == $player && $board[$x + 3][$y - 3] == $player));
+	}
+	
  }
 
