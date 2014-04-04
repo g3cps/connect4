@@ -60,13 +60,6 @@ class Board extends CI_Controller {
     	
     	$data['user']=$user;
     	$data['otherUser']=$otherUser;
-		if ($user->id < $otherUser->id){
-			$data['p1'] = $user->id;
-			$data['p2'] = $otherUser->id;
-		} else {
-			$data['p2'] = $user->id;
-			$data['p1'] = $otherUser->id;
-		}
 		
     	switch($user->user_status_id) {
     		case User::PLAYING:	
@@ -107,6 +100,10 @@ class Board extends CI_Controller {
 		//Check if message is a number
 		if (is_numeric($msg)){
 			$col = (int) $msg;
+			if ($col > 6){
+				$errormsg="number too big, has to be less than 7";
+				goto error;
+			}
 		} else {
 			$errormsg="message not a number: " . $msg;
 			goto error;
@@ -271,7 +268,22 @@ class Board extends CI_Controller {
 	}
 	
 	function getPlayer(){
-		echo json_encode(array('p1'=>$_SESSION['p1'],'p2'=>$_SESSION['p2']));
+		$this->load->model('user_model');
+ 		$this->load->model('match_model');
+ 		
+ 		$user = $_SESSION['user'];
+ 		$user = $this->user_model->get($user->login);
+ 		if ($user->user_status_id != User::PLAYING) {
+ 			echo json_encode(array('p1'=>-1,'p2'=>-1));
+ 		}
+		$match = $this->match_model->getExclusive($user->match_id);	
+		if ($match){
+			$p1 = $match->user1_id;
+			$p2 = $match->user2_id;
+			echo json_encode(array('p1'=>$p1,'p2'=>$p2));
+		} else {
+			echo json_encode(array('p1'=>-1,'p2'=>-1));
+		}		
 	}
 	
  }

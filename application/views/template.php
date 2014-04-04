@@ -12,10 +12,6 @@
     <div id='nav'>
     	<ul>
     		<li><?php echo "<p>" . anchor('account/index','Home') . "</p>";?></li>
-                <?php
-                    if (isset($_SESSION['user']))
-                        echo "<li><p>" . anchor('board/index','To Game') . "</p></li>";
-                ?>
     	</ul>
     </div>
 	<div id='main'>
