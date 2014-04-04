@@ -15,7 +15,7 @@
 		var p2img = "<img src=" + "<?= base_url() ?>/images/yellow.jpg" + " height='40' width='40'>";
 		var p1 = -1;
 		var p2 = -2;
-		var gotPlayer = false;
+		var gotPlayer = false; //make sure both players are in the game
 		
 		//update screen client's board
 		function get_board(){
@@ -53,7 +53,7 @@
 			//Receive data
 			$('body').everyTime(1000,function(){
 				
-				if (!gotPlayer){
+				if (!gotPlayer){//Let client know which player he/she is playing as
 					$.getJSON('<?= base_url() ?>index.php/board/getPlayer',function(data, text, jqZHR){
 						if (data){
 							p1 = data.p1;
@@ -96,7 +96,8 @@
 							var msg = data.message;
 							if (msg && msg.length > 0){
 								var datetime = get_datetime();
-								get_board()
+								get_board();
+								//append message to the start of conversation to show updates
 								$('[name=conversation]').val(
 								datetime + "\n    " + otherUser + "'s move: column "+ msg + "\n    Please make the next move.\n\n" + conversation);
 							}
@@ -116,11 +117,11 @@
 					var url = "<?= base_url() ?>index.php/board/postMsg";
 					$.post(url,arguments, function (data,textStatus,jqXHR){
 						var conversation = $('[name=conversation]').val();
-						//append message to the end of conversation
 						if (data){
 							var datetime = get_datetime();
 							data = JSON.parse(data);
 							var msg = data.message;
+							//append message to the start of conversation to show updates
 							if (data.status == "success"){
 								$('[name=conversation]').val(datetime + "\n    " + user + "'s move: column " + msg + "\n\n" + conversation);
 								get_board();
